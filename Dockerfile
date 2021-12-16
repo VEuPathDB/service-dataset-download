@@ -5,10 +5,11 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 FROM veupathdb/alpine-dev-base:jdk-16 AS prep
 
+LABEL service="dataset-download-build"
+
 ARG GITHUB_USERNAME
 ARG GITHUB_TOKEN
 
-LABEL service="demo-service"
 
 WORKDIR /workspace
 RUN jlink --compress=2 --module-path /opt/jdk/jmods \
@@ -19,9 +20,16 @@ RUN jlink --compress=2 --module-path /opt/jdk/jmods \
 
 ENV DOCKER=build
 
+COPY makefile .
+
+RUN make install-dev-env
+
 COPY . .
+
 RUN mkdir -p vendor \
     && cp -n /jdbc/* vendor \
+    && echo Installing Gradle \
+    && ./gradlew dependencies --info --configuration runtimeClasspath \
     && make jar
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -31,7 +39,7 @@ RUN mkdir -p vendor \
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 FROM foxcapades/alpine-oracle:1.3
 
-LABEL service="demo-service"
+LABEL service="dataset-download"
 
 ENV JAVA_HOME=/opt/jdk \
     PATH=/opt/jdk/bin:$PATH

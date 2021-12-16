@@ -1,12 +1,13 @@
 //
 // Version Numbers
 //
-val coreLib = "5.3.0" // Container core lib version
+val coreLib   = "5.3.0" // Container core lib version
+val edaCommon = "7.0.0"  // EDA Common version
 
-val jersey  = "2.+"   // Jersey/JaxRS version
-val jackson = "2.+"   // FasterXML Jackson version
-val junit   = "5.+"   // JUnit version
-val log4j   = "2.+"   // Log4J version
+val jersey  = "2.33"   // Jersey/JaxRS version
+val jackson = "2.12.2"   // FasterXML Jackson version
+val junit   = "5.7.1"   // JUnit version
+val log4j   = "2.16.0"   // Log4J version
 val metrics = "0.9.0" // Prometheus lib version
 
 val implementation by configurations
@@ -14,6 +15,18 @@ val runtimeOnly    by configurations
 
 val testImplementation by configurations
 val testRuntimeOnly    by configurations
+
+// use local EdaCommon compiled schema if project exists, else use released version;
+//    this mirrors the way we use local EdaCommon code if available
+val edaCommonLocalProjectDir = findProject(":edaCommon")?.projectDir
+val edaCommonSchemaFetch =
+  if (edaCommonLocalProjectDir != null)
+    "cat ${edaCommonLocalProjectDir}/schema/library.raml"
+  else
+    "curl https://raw.githubusercontent.com/VEuPathDB/EdaCommon/v${edaCommon}/schema/library.raml"
+
+// register a task that prints the command to fetch EdaCommon schema; used to pull down raml lib
+tasks.register("print-eda-common-schema-fetch") { print(edaCommonSchemaFetch) }
 
 dependencies {
 
@@ -51,15 +64,15 @@ dependencies {
     "vendor/xstreams.jar"
   ))
 
-
-  // Core lib, prefers local checkout if available
+  // VEuPathDB libs, prefer local checkouts if available
   implementation(findProject(":core") ?: "org.veupathdb.lib:jaxrs-container-core:${coreLib}")
-
+  implementation(findProject(":edaCommon") ?: "org.veupathdb.service.eda:eda-common:${edaCommon}")
 
   // Jersey
   implementation("org.glassfish.jersey.containers:jersey-container-grizzly2-http:${jersey}")
   implementation("org.glassfish.jersey.containers:jersey-container-grizzly2-servlet:${jersey}")
   implementation("org.glassfish.jersey.media:jersey-media-json-jackson:${jersey}")
+  implementation("org.glassfish.jersey.core:jersey-client:${jersey}")
   runtimeOnly("org.glassfish.jersey.inject:jersey-hk2:${jersey}")
 
   // Jackson

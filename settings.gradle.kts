@@ -13,6 +13,12 @@ if (core.exists()) {
   project(":core").projectDir = core
 }
 
+val edaCommon = file("../EdaCommon");
+if (edaCommon.exists()) {
+  include(":edaCommon")
+  project(":edaCommon").projectDir = edaCommon
+}
+
 pluginManagement {
   repositories {
     mavenLocal()

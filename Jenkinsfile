@@ -12,6 +12,6 @@ node('centos8') {
 
   // See the docs at https://github.com/VEuPathDB/pipelib/blob/main/src/org/veupathdb/lib/Builder.groovy#L41
   builder.buildContainers([
-    [ name: 'demo-service' ],
+    [ name: 'dataset-download-service' ],
   ])
 }

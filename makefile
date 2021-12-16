@@ -1,13 +1,13 @@
+GEN_PACKAGE  := $(shell ./gradlew -q print-gen-package)
 APP_PACKAGE  := $(shell ./gradlew -q print-package)
 PWD          := $(shell pwd)
 MAIN_DIR     := src/main/java/$(shell echo $(APP_PACKAGE) | sed 's/\./\//g')
 TEST_DIR     := $(shell echo $(MAIN_DIR) | sed 's/main/test/')
 GEN_DIR      := $(MAIN_DIR)/generated
 ALL_PACKABLE := $(shell find src/main -type f)
-BIN_DIR := .tools/bin
+BIN_DIR      := .tools/bin
 
-EXAMPLE_DIR      := src/main/java/org/veupathdb/service/demo
-EXAMPLE_TEST_DIR := src/test/java/org/veupathdb/service/demo
+FETCH_EDA_COMMON_SCHEMA := $(shell ./gradlew -q "print-eda-common-schema-fetch")
 
 C_BLUE := "\\033[94m"
 C_NONE := "\\033[0m"
@@ -57,11 +57,9 @@ jar: install-dev-env build/libs/service.jar
 
 .PHONY: docker
 docker:
-	@./gradlew build-docker --stacktrace
-
-.PHONY: cleanup-example
-cleanup-example:
-	@$(BIN_DIR)/demo-cleanup.sh $(MAIN_DIR)
+	@docker build --no-cache -t $(shell ./gradlew -q print-container-name) \
+		--build-arg=GITHUB_USERNAME=$(GITHUB_USERNAME) \
+		--build-arg=GITHUB_TOKEN=$(GITHUB_TOKEN) .
 
 .PHONY: install-dev-env
 install-dev-env:
@@ -71,9 +69,9 @@ install-dev-env:
 		cd .tools && git pull && cd ..; \
 	fi
 	@$(BIN_DIR)/check-env.sh
-	@./gradlew fgputilInstall --stacktrace
+	@$(BIN_DIR)/install-fgputil.sh
 	@$(BIN_DIR)/install-oracle.sh
-	@./gradlew ramlGenInstall --stacktrace
+	@$(BIN_DIR)/install-raml2jaxrs.sh
 	@$(BIN_DIR)/install-raml-merge.sh
 	@$(BIN_DIR)/install-npm.sh
 
@@ -81,18 +79,22 @@ clean:
 	@rm -rf .gradle .tools vendor build
 
 fix-path:
-	@$(BIN_DIR)/fix-path.sh $(EXAMPLE_DIR) $(MAIN_DIR)
-	@$(BIN_DIR)/fix-path.sh $(EXAMPLE_TEST_DIR) $(TEST_DIR)
+	@$(BIN_DIR)/fix-path.sh $(MAIN_DIR)
+	@$(BIN_DIR)/fix-path.sh $(TEST_DIR)
 
 gen-jaxrs: api.raml merge-raml
-	@./gradlew generate-jaxrs --stacktrace
-	@$(BIN_DIR)/generate-jaxrs-streams.sh $(APP_PACKAGE)
+	@$(BIN_DIR)/generate-jaxrs.sh $(GEN_PACKAGE)
+	@$(BIN_DIR)/generate-jaxrs-streams.sh $(GEN_PACKAGE)
+	@$(BIN_DIR)/generate-jaxrs-postgen-mods.sh $(GEN_PACKAGE)
 
 gen-docs: api.raml merge-raml
 	@$(BIN_DIR)/generate-docs.sh
 
 merge-raml:
-	@$(BIN_DIR)/merge-raml schema > schema/library.raml
+	@echo "Downloading dependencies..."
+	$(FETCH_EDA_COMMON_SCHEMA) > schema/url/eda-common-lib.raml
+	$(BIN_DIR)/merge-raml schema > schema/library.raml
+	rm schema/url/eda-common-lib.raml
 
 #
 # File based targets

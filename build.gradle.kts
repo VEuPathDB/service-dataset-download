@@ -5,7 +5,6 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 plugins {
   java
-  id("org.veupathdb.lib.gradle.container.container-utils") version "1.4.0"
 }
 
 apply(from = "dependencies.gradle.kts")
@@ -13,14 +12,12 @@ apply(from = "dependencies.gradle.kts")
 // Load Props
 val buildProps = Properties()
 buildProps.load(FileInputStream(File(rootDir, "service.properties")))
+val genPack = "${buildProps["app.package.root"]}"
 val fullPack = "${buildProps["app.package.root"]}.${buildProps["app.package.service"]}"
 
 java {
   targetCompatibility = JavaVersion.VERSION_16
   sourceCompatibility = JavaVersion.VERSION_16
-}
-
-containerBuild {
 }
 
 // Project settings
@@ -64,6 +61,7 @@ tasks.jar {
   archiveFileName.set("service.jar")
 }
 
+tasks.register("print-gen-package") { print(genPack) }
 tasks.register("print-package") { print(fullPack) }
 tasks.register("print-container-name") { print(buildProps["container.name"]) }
 
