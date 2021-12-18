@@ -8,15 +8,15 @@ import org.veupathdb.service.generated.model.File;
 
 public class FileRetrieval {
 
-  public static List<String> getReleaseList(String studyId) {
+  public static List<String> getReleaseList(String datasetHash) {
     return Collections.emptyList();
   }
 
-  public static List<File> getFileList(String studyId, String release) {
+  public static List<File> getFileList(String datasetHash, String release) {
     return Collections.emptyList();
   }
 
-  public static Consumer<OutputStream> getFileStreamer(String studyId, String release, String file) {
+  public static Consumer<OutputStream> getFileStreamer(String datasetHash, String release, String file) {
     return out -> {};
   }
 

@@ -14,13 +14,6 @@ public class Main extends Server {
 
   @Override
   protected ContainerResources newResourceConfig(Options options) {
-    final var out =  new Resources(options);
-
-    // Enabled by default for debugging purposes, this should be removed when
-    // production ready.
-    out.property("jersey.config.server.tracing.type", "ALL")
-      .property("jersey.config.server.tracing.threshold", "VERBOSE");
-
-    return out;
+    return new Resources(options);
   }
 }

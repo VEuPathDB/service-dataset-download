@@ -7,17 +7,6 @@
 ################################################################################
 
 types:
-  File:
-    type: object
-    additionalProperties: false
-    properties:
-      name: string
-      modifiedDate: string
-      size: string
-  FileContentResponse:
-    type: object
-    properties:
-      //: any
   API_Filter:
     type: object
     discriminator: type
@@ -341,4 +330,15 @@ types:
       binWidth?: number
       binWidthOverride?: number
       binUnits?: BinUnits
+  File:
+    type: object
+    additionalProperties: false
+    properties:
+      name: string
+      modifiedDate: string
+      size: string
+  FileContentResponse:
+    type: object
+    properties:
+      //: any
 

@@ -10,7 +10,6 @@ LABEL service="dataset-download-build"
 ARG GITHUB_USERNAME
 ARG GITHUB_TOKEN
 
-
 WORKDIR /workspace
 RUN jlink --compress=2 --module-path /opt/jdk/jmods \
        --add-modules java.base,java.logging,java.xml,java.desktop,java.management,java.sql,java.naming \
