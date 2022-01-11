@@ -21,36 +21,36 @@ securitySchemes:
           description: Authorization header.
           type: string
 
-
 #
 # Endpoints
 #
 
 /download:
-  /{study-id}:
-    displayName: Get release listing for this study ID
-    get:
-      responses:
-        200:
-          body:
-            application/json:
-              type: string[]
-
-    /{release}:
-      displayName: Get file listing for this release
+  /{project}:
+    /{study-id}:
+      displayName: Get release listing for this study ID
       get:
         responses:
           200:
             body:
               application/json:
-                type: lib.File[]
+                type: string[]
 
-      /{file}:
-        displayName: Download a single file
-        securedBy: header-auth
+      /{release}:
+        displayName: Get file listing for this release
         get:
           responses:
             200:
               body:
-                text/plain:
-                  type: lib.FileContentResponse
+                application/json:
+                  type: lib.File[]
+
+        /{file}:
+          displayName: Download a single file
+          securedBy: header-auth
+          get:
+            responses:
+              200:
+                body:
+                  text/plain:
+                    type: lib.FileContentResponse

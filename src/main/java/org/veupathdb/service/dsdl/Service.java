@@ -22,24 +22,24 @@ public class Service implements Download {
   private ContainerRequestContext _request;
 
   @Override
-  public GetDownloadByStudyIdResponse getDownloadByStudyId(String studyId) {
+  public GetDownloadByProjectAndStudyIdResponse getDownloadByProjectAndStudyId(String project, String studyId) {
     String datasetHash = checkPermsAndFetchDatasetHash(studyId, StudyAccess::allowStudyMetadata);
-    return GetDownloadByStudyIdResponse.respond200WithApplicationJson(
-        FileRetrieval.getReleaseList(datasetHash));
+    return GetDownloadByProjectAndStudyIdResponse.respond200WithApplicationJson(
+        FileRetrieval.getReleaseList(project, datasetHash));
   }
 
   @Override
-  public GetDownloadByStudyIdAndReleaseResponse getDownloadByStudyIdAndRelease(String studyId, String release) {
+  public GetDownloadByProjectAndStudyIdAndReleaseResponse getDownloadByProjectAndStudyIdAndRelease(String project, String studyId, String release) {
     String datasetHash = checkPermsAndFetchDatasetHash(studyId, StudyAccess::allowStudyMetadata);
-    return GetDownloadByStudyIdAndReleaseResponse.respond200WithApplicationJson(
-        FileRetrieval.getFileList(datasetHash, release));
+    return GetDownloadByProjectAndStudyIdAndReleaseResponse.respond200WithApplicationJson(
+        FileRetrieval.getFileList(project, datasetHash, release));
   }
 
   @Override
-  public GetDownloadByStudyIdAndReleaseAndFileResponse getDownloadByStudyIdAndReleaseAndFile(String studyId, String release, String file) {
+  public GetDownloadByProjectAndStudyIdAndReleaseAndFileResponse getDownloadByProjectAndStudyIdAndReleaseAndFile(String project, String studyId, String release, String file) {
     String datasetHash = checkPermsAndFetchDatasetHash(studyId, StudyAccess::allowResultsAll);
-    return GetDownloadByStudyIdAndReleaseAndFileResponse.respond200WithTextPlain(
-        new FileContentResponseStream(FileRetrieval.getFileStreamer(datasetHash, release, file)));
+    return GetDownloadByProjectAndStudyIdAndReleaseAndFileResponse.respond200WithTextPlain(
+        new FileContentResponseStream(FileRetrieval.getFileStreamer(project, datasetHash, release, file)));
   }
 
   private String checkPermsAndFetchDatasetHash(String studyId, Function<StudyAccess, Boolean> accessGranter) {
@@ -55,5 +55,4 @@ public class Service implements Download {
     }
     return study.getSha1Hash();
   }
-
 }
