@@ -1,6 +1,6 @@
 #!groovy
 
-@Library('pipelib@github-creds')
+@Library('pipelib')
 import org.veupathdb.lib.Builder
 
 node('centos8') {
@@ -12,6 +12,6 @@ node('centos8') {
 
   // See the docs at https://github.com/VEuPathDB/pipelib/blob/main/src/org/veupathdb/lib/Builder.groovy#L41
   builder.buildContainers([
-    [ name: 'dataset-download-service' ],
+    [ name: 'dataset-download' ],
   ])
 }
