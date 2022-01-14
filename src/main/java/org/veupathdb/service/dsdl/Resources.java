@@ -27,7 +27,7 @@ public class Resources extends ContainerResources {
   private static final Logger LOG = LogManager.getLogger(Resources.class);
 
   public static final String DATASET_ACCESS_SERVICE_URL = getRequiredVar("DATASET_ACCESS_SERVICE_URL");
-  public static final Path DATA_FILES_PARENT_DIR = getReadableDir(Paths.get(Environment.getRequiredVar("DATA_FILES_PARENT_DIR")));
+  public static final Path DOWNLOAD_FILES_MOUNT_PATH = getReadableDir(Paths.get(Environment.getRequiredVar("DOWNLOAD_FILES_MOUNT_PATH")));
 
   private static final String RAW_FILES_DIR_PROP = "RAW_FILES_DIR";
   private static Map<String,String> PROJECT_DIR_MAP;
@@ -49,7 +49,7 @@ public class Resources extends ContainerResources {
     if (!PROJECT_DIR_MAP.containsKey(projectId)) {
       throw new NotFoundException("Invalid project ID: " + projectId);
     }
-    return getReadableDir(DATA_FILES_PARENT_DIR.resolve(PROJECT_DIR_MAP.get(projectId)));
+    return getReadableDir(DOWNLOAD_FILES_MOUNT_PATH.resolve(PROJECT_DIR_MAP.get(projectId)));
   }
 
   private static Path getReadableDir(Path dirPath) {
