@@ -35,6 +35,9 @@ public class Resources extends ContainerResources {
   public Resources(Options opts) {
     super(opts);
 
+    // log raw files location
+    LOG.info("Will use parent raw files directory: " + DOWNLOAD_FILES_MOUNT_PATH);
+
     // check for valid project-specific props
     PROJECT_DIR_MAP = new ProjectSpecificProperties<>(
         new ProjectSpecificProperties.PropertySpec[] { required(RAW_FILES_DIR_PROP) },
