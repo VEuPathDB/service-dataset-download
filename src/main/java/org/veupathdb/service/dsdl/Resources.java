@@ -12,6 +12,7 @@ import org.gusdb.fgputil.runtime.Environment;
 import org.gusdb.fgputil.runtime.ProjectSpecificProperties;
 import org.veupathdb.lib.container.jaxrs.config.Options;
 import org.veupathdb.lib.container.jaxrs.server.ContainerResources;
+import org.veupathdb.lib.container.jaxrs.utils.db.DbManager;
 
 import static org.gusdb.fgputil.runtime.Environment.getRequiredVar;
 import static org.gusdb.fgputil.runtime.ProjectSpecificProperties.PropertySpec.required;
@@ -45,6 +46,8 @@ public class Resources extends ContainerResources {
     ).toMap();
     LOG.info("Schema map: " + FormatUtil.prettyPrint(PROJECT_DIR_MAP, FormatUtil.Style.MULTI_LINE));
 
+    DbManager.initAccountDatabase(opts);
+    DbManager.initUserDatabase(opts);
     enableAuth();
   }
 
