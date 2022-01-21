@@ -16,8 +16,8 @@ val genPack = "${buildProps["app.package.root"]}"
 val fullPack = "${buildProps["app.package.root"]}.${buildProps["app.package.service"]}"
 
 java {
-  targetCompatibility = JavaVersion.VERSION_16
-  sourceCompatibility = JavaVersion.VERSION_16
+  targetCompatibility = JavaVersion.VERSION_15
+  sourceCompatibility = JavaVersion.VERSION_15
 }
 
 // Project settings
