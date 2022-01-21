@@ -3,7 +3,7 @@
 #   Build Service & Dependencies
 #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-FROM veupathdb/alpine-dev-base:jdk-16 AS prep
+FROM veupathdb/alpine-dev-base:jdk-15 AS prep
 
 LABEL service="dataset-download-build"
 
