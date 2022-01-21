@@ -47,6 +47,7 @@ public class FileStore {
 
   private static MetadataMap init(Path projectDir) {
     try {
+      LOG.info("Initializing file store at project dir: " + projectDir.toAbsolutePath());
       MetadataMap datasetMap = new MetadataMap();
       for (Path releaseDir : getContents(projectDir, FileStore::isDirectory)) {
         for (Path datasetHashDir : getContents(releaseDir, FileStore::isDirectory)) {

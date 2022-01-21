@@ -9,6 +9,8 @@ import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.Context;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.gusdb.fgputil.IoUtil;
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated;
 import org.veupathdb.lib.container.jaxrs.utils.RequestKeys;
@@ -23,11 +25,14 @@ import static org.gusdb.fgputil.functional.Functions.cSwallow;
 @Authenticated(allowGuests = true)
 public class Service implements Download {
 
+  private static final Logger LOG = LogManager.getLogger(Service.class);
+
   @Context
   private ContainerRequestContext _request;
 
   @Override
   public GetDownloadByProjectAndStudyIdResponse getDownloadByProjectAndStudyId(String project, String studyId) {
+    LOG.info("Get releases by " + project + " and " + studyId);
     String datasetHash = checkPermsAndFetchDatasetHash(studyId, StudyAccess::allowStudyMetadata);
     return GetDownloadByProjectAndStudyIdResponse.respond200WithApplicationJson(
         new FileStore(Resources.getDatasetsParentDir(project))
@@ -37,6 +42,7 @@ public class Service implements Download {
 
   @Override
   public GetDownloadByProjectAndStudyIdAndReleaseResponse getDownloadByProjectAndStudyIdAndRelease(String project, String studyId, String release) {
+    LOG.info("Get files by " + project + " and " + studyId + " and " + release);
     String datasetHash = checkPermsAndFetchDatasetHash(studyId, StudyAccess::allowStudyMetadata);
     return GetDownloadByProjectAndStudyIdAndReleaseResponse.respond200WithApplicationJson(
         new FileStore(Resources.getDatasetsParentDir(project))
@@ -46,6 +52,7 @@ public class Service implements Download {
 
   @Override
   public GetDownloadByProjectAndStudyIdAndReleaseAndFileResponse getDownloadByProjectAndStudyIdAndReleaseAndFile(String project, String studyId, String release, String fileName) {
+    LOG.info("Get file content at " + project + " and " + studyId + " and " + release + " and " + fileName);
     String datasetHash = checkPermsAndFetchDatasetHash(studyId, StudyAccess::allowResultsAll);
     Path filePath = new FileStore(Resources.getDatasetsParentDir(project))
         .getFilePath(datasetHash, release, fileName)
@@ -56,16 +63,22 @@ public class Service implements Download {
   }
 
   private String checkPermsAndFetchDatasetHash(String studyId, Function<StudyAccess, Boolean> accessGranter) {
-    Entry<String,String> authHeader = StudyAccess.readAuthHeader(_request, RequestKeys.AUTH_HEADER);
-    Map<String, StudyDatasetInfo> studyMap =
-        new DatasetAccessClient(Resources.DATASET_ACCESS_SERVICE_URL, authHeader).getStudyDatasetInfoMapForUser();
-    StudyDatasetInfo study = studyMap.get(studyId);
-    if (study == null) {
-      throw new NotFoundException("Study '" + studyId + "' cannot be found [dataset access service].");
+    try {
+      Entry<String,String> authHeader = StudyAccess.readAuthHeader(_request, RequestKeys.AUTH_HEADER);
+      Map<String, StudyDatasetInfo> studyMap =
+          new DatasetAccessClient(Resources.DATASET_ACCESS_SERVICE_URL, authHeader).getStudyDatasetInfoMapForUser();
+      StudyDatasetInfo study = studyMap.get(studyId);
+      if (study == null) {
+        throw new NotFoundException("Study '" + studyId + "' cannot be found [dataset access service].");
+      }
+      if (!accessGranter.apply(study.getStudyAccess())) {
+        throw new ForbiddenException("Permission Denied");
+      }
+      return study.getSha1Hash();
     }
-    if (!accessGranter.apply(study.getStudyAccess())) {
-      throw new ForbiddenException("Permission Denied");
+    catch (Exception e) {
+      LOG.error("Unable to check study permissions and convert studyId to dataset hash", e);
+      throw e;
     }
-    return study.getSha1Hash();
   }
 }
