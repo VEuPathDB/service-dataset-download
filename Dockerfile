@@ -3,7 +3,7 @@
 #   Build Service & Dependencies
 #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-FROM veupathdb/alpine-dev-base:jdk-15 AS prep
+FROM veupathdb/alpine-dev-base:jdk-16 AS prep
 
 LABEL service="dataset-download-build"
 
@@ -12,7 +12,7 @@ ARG GITHUB_TOKEN
 
 WORKDIR /workspace
 RUN jlink --compress=2 --module-path /opt/jdk/jmods \
-       --add-modules java.base,java.logging,java.xml,java.desktop,java.management,java.sql,java.naming \
+       --add-modules java.base,java.net.http,java.security.jgss,java.logging,java.xml,java.desktop,java.management,java.sql,java.naming \
        --output /jlinked \
     && apk add --no-cache git sed findutils coreutils make npm curl gawk \
     && git config --global advice.detachedHead false
@@ -36,7 +36,7 @@ RUN mkdir -p vendor \
 #   Run the service
 #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-FROM foxcapades/alpine-oracle:1.3
+FROM foxcapades/alpine-oracle:1.6
 
 LABEL service="dataset-download"
 
