@@ -46,6 +46,7 @@ public class Resources extends ContainerResources {
     ).toMap();
     LOG.info("Schema map: " + FormatUtil.prettyPrint(PROJECT_DIR_MAP, FormatUtil.Style.MULTI_LINE));
 
+    enableJerseyTrace();
     DbManager.initAccountDatabase(opts);
     DbManager.initUserDatabase(opts);
     enableAuth();
