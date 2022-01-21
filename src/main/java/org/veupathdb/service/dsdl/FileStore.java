@@ -11,9 +11,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.veupathdb.service.generated.model.File;
 
 public class FileStore {
+
+  private static final Logger LOG = LogManager.getLogger(FileStore.class);
 
   // map from dataset hash -> (map from release dir -> (map from file name -> File>))
   private static class MetadataMap extends HashMap<String, Map<String, Map<String, FileInfo>>> { }
@@ -63,7 +67,12 @@ public class FileStore {
       return datasetMap;
     }
     catch (IOException e) {
+      LOG.error("[IO] Unable to initialize FileStore for project dir " + projectDir.toAbsolutePath(), e);
       throw new RuntimeException("Unable to read filesystem contents", e);
+    }
+    catch (Exception e) {
+      LOG.error("[Gen] Unable to initialize FileStore for project dir " + projectDir.toAbsolutePath(), e);
+      throw e;
     }
   }
 
