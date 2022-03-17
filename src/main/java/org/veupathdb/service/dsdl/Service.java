@@ -7,16 +7,16 @@ import java.util.Map.Entry;
 import java.util.function.Function;
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.NotFoundException;
-import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.glassfish.jersey.server.ContainerRequest;
 import org.gusdb.fgputil.IoUtil;
 import org.gusdb.fgputil.MapBuilder;
+import org.veupathdb.lib.container.jaxrs.providers.UserProvider;
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated;
 import org.veupathdb.lib.container.jaxrs.server.middleware.CustomResponseHeadersFilter;
-import org.veupathdb.lib.container.jaxrs.utils.RequestKeys;
 import org.veupathdb.service.eda.common.auth.StudyAccess;
 import org.veupathdb.service.eda.common.client.DatasetAccessClient;
 import org.veupathdb.service.eda.common.client.DatasetAccessClient.StudyDatasetInfo;
@@ -31,7 +31,7 @@ public class Service implements Download {
   private static final Logger LOG = LogManager.getLogger(Service.class);
 
   @Context
-  ContainerRequestContext _request;
+  ContainerRequest _request;
 
   @Override
   public GetDownloadByProjectAndStudyIdResponse getDownloadByProjectAndStudyId(String project, String studyId) {
@@ -40,7 +40,7 @@ public class Service implements Download {
     return GetDownloadByProjectAndStudyIdResponse.respond200WithApplicationJson(
         new FileStore(Resources.getDatasetsParentDir(project))
             .getReleaseNames(datasetHash)
-            .orElseThrow(() -> new NotFoundException()));
+            .orElseThrow(NotFoundException::new));
   }
 
   @Override
@@ -50,7 +50,7 @@ public class Service implements Download {
     return GetDownloadByProjectAndStudyIdAndReleaseResponse.respond200WithApplicationJson(
         new FileStore(Resources.getDatasetsParentDir(project))
             .getFiles(datasetHash, release)
-            .orElseThrow(() -> new NotFoundException()));
+            .orElseThrow(NotFoundException::new));
   }
 
   @Override
@@ -59,10 +59,10 @@ public class Service implements Download {
     String datasetHash = checkPermsAndFetchDatasetHash(studyId, StudyAccess::allowResultsAll);
     Path filePath = new FileStore(Resources.getDatasetsParentDir(project))
         .getFilePath(datasetHash, release, fileName)
-        .orElseThrow(() -> new NotFoundException());
+        .orElseThrow(NotFoundException::new);
     String dispositionHeaderValue = "attachment; filename=\"" + fileName + "\"";
     _request.setProperty(CustomResponseHeadersFilter.CUSTOM_HEADERS_KEY,
-        new MapBuilder<String,String>(HttpHeaders.CONTENT_DISPOSITION, dispositionHeaderValue).toMap());
+        new MapBuilder<>(HttpHeaders.CONTENT_DISPOSITION, dispositionHeaderValue).toMap());
     return GetDownloadByProjectAndStudyIdAndReleaseAndFileResponse.respond200WithTextPlain(
         new FileContentResponseStream(cSwallow(
             out -> IoUtil.transferStream(out, Files.newInputStream(filePath)))));
@@ -70,7 +70,7 @@ public class Service implements Download {
 
   private String checkPermsAndFetchDatasetHash(String studyId, Function<StudyAccess, Boolean> accessGranter) {
     try {
-      Entry<String,String> authHeader = StudyAccess.readAuthHeader(_request, RequestKeys.AUTH_HEADER);
+      Entry<String,String> authHeader = UserProvider.getSubmittedAuth(_request).orElseThrow();
       Map<String, StudyDatasetInfo> studyMap =
           new DatasetAccessClient(Resources.DATASET_ACCESS_SERVICE_URL, authHeader).getStudyDatasetInfoMapForUser();
       StudyDatasetInfo study = studyMap.get(studyId);
