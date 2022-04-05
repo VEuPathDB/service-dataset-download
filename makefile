@@ -68,9 +68,8 @@ install-dev-env:
 	else \
 		cd .tools && git pull && cd ..; \
 	fi
-	cd .tools && git checkout jersey-upgrade && cd ..
 	@$(BIN_DIR)/check-env.sh
-	@$(BIN_DIR)/install-fgputil.sh
+	@$(BIN_DIR)/install-fgputil.sh "tomcat10"
 	@$(BIN_DIR)/install-oracle.sh
 	@$(BIN_DIR)/install-raml2jaxrs.sh
 	@$(BIN_DIR)/install-raml-merge.sh
