@@ -69,7 +69,7 @@ install-dev-env:
 		cd .tools && git pull && cd ..; \
 	fi
 	@$(BIN_DIR)/check-env.sh
-	@$(BIN_DIR)/install-fgputil.sh
+	@$(BIN_DIR)/install-fgputil.sh "tomcat10"
 	@$(BIN_DIR)/install-oracle.sh
 	@$(BIN_DIR)/install-raml2jaxrs.sh
 	@$(BIN_DIR)/install-raml-merge.sh
@@ -86,6 +86,7 @@ gen-jaxrs: api.raml merge-raml
 	@$(BIN_DIR)/generate-jaxrs.sh $(GEN_PACKAGE)
 	@$(BIN_DIR)/generate-jaxrs-streams.sh $(GEN_PACKAGE)
 	@$(BIN_DIR)/generate-jaxrs-postgen-mods.sh $(GEN_PACKAGE)
+	@grep -Rl javax src | xargs -I{} sed -i 's/javax.ws/jakarta.ws/g' {}
 
 gen-docs: api.raml merge-raml
 	@$(BIN_DIR)/generate-docs.sh
