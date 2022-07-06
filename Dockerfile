@@ -3,7 +3,7 @@
 #   Build Service & Dependencies
 #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-FROM veupathdb/alpine-dev-base:jdk-16 AS prep
+FROM veupathdb/alpine-dev-base:jdk-17 AS prep
 
 LABEL service="dataset-download-build"
 
@@ -11,6 +11,7 @@ ARG GITHUB_USERNAME
 ARG GITHUB_TOKEN
 
 WORKDIR /workspace
+
 RUN jlink --compress=2 --module-path /opt/jdk/jmods \
        --add-modules java.base,java.net.http,java.security.jgss,java.logging,java.xml,java.desktop,java.management,java.sql,java.naming \
        --output /jlinked \
@@ -19,17 +20,22 @@ RUN jlink --compress=2 --module-path /opt/jdk/jmods \
 
 ENV DOCKER=build
 
-COPY makefile .
+# copy files required to build dev environment and fetch dependencies
+COPY makefile build.gradle.kts settings.gradle.kts gradlew ./
+COPY gradle gradle
 
+# cache build environment
 RUN make install-dev-env
 
+# cache gradle and dependencies installation
+RUN ./gradlew dependencies
+
+# copy remaining files
 COPY . .
 
-RUN mkdir -p vendor \
-    && cp -n /jdbc/* vendor \
-    && echo Installing Gradle \
-    && ./gradlew dependencies --info --configuration runtimeClasspath \
-    && make jar
+# build the project
+RUN make jar
+
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #
