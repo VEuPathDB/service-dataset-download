@@ -4,10 +4,10 @@
 
 This service wraps a collection of raw dataset files that are exposed for direct user download.  Previously these files and their directory structure were exposed directly via Apache (rendered in an iframe), but this had a number of drawbacks:
 
-1. Apache's HTML responses enabled a single not-that-pretty UI
-2. No access control
-  1. Users could potentially see all files under the configured root directory
-  2. No user-specific access control (all users saw the same thing and could download all files)
+. Apache's HTML responses enabled a single not-that-pretty UI
+. No access control
+.. Users could potentially see all files under the configured root directory
+.. No user-specific access control (all users saw the same thing and could download all files)
 
 The EDA system required additional access metadata and provider control, which was provided by the https://github.com/VEuPathDB/service-dataset-access[dataset access service].  The dataset access service is utilized by this service to control access to a study's raw files based on the user making the request.
 
