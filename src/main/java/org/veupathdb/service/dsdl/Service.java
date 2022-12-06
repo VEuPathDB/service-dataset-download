@@ -65,7 +65,10 @@ public class Service implements Download {
         new MapBuilder<>(HttpHeaders.CONTENT_DISPOSITION, dispositionHeaderValue).toMap());
     return GetDownloadByProjectAndStudyIdAndReleaseAndFileResponse.respond200WithTextPlain(
         new FileContentResponseStream(cSwallow(
-            out -> IoUtil.transferStream(out, Files.newInputStream(filePath)))));
+            out -> {
+              IoUtil.transferStream(out, Files.newInputStream(filePath));
+              Metrics.countDownload(studyId);
+            })));
   }
 
   private String checkPermsAndFetchDatasetHash(String studyId, Function<StudyAccess, Boolean> accessGranter) {
