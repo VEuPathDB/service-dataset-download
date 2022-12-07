@@ -3,13 +3,13 @@ package org.veupathdb.service.dsdl;
 import io.prometheus.client.Counter;
 
 public class Metrics {
-  private static final Counter DOWNLOADS_BY_DATASET = Counter.build()
+  private static final Counter DOWNLOADS_BY_STUDY_ID = Counter.build()
       .name("dataset_download")
       .help("Total successfully uploaded datasets.")
-      .labelNames("dataset_name")
+      .labelNames("study_id")
       .register();
 
-  public static void countDownload(String datasetName) {
-    DOWNLOADS_BY_DATASET.labels(datasetName).inc();
+  public static void countDownload(String studyId) {
+    DOWNLOADS_BY_STUDY_ID.labels(studyId).inc();
   }
 }
