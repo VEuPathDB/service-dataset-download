@@ -7,6 +7,17 @@
 ################################################################################
 
 types:
+  File:
+    type: object
+    additionalProperties: false
+    properties:
+      name: string
+      modifiedDate: string
+      size: string
+  FileContentResponse:
+    type: object
+    properties:
+      //: any
   VariableClass:
     type: string
     enum:
@@ -344,10 +355,21 @@ types:
     additionalProperties: false
     properties:
       study: API_StudyDetail
+  StudySourceType:
+    type: string
+    enum:
+      - curated
+      - user_submitted
   API_StudyOverview:
     type: object
     properties:
       id: string
+      datasetId: string
+      sha1hash: string
+      sourceType: StudySourceType
+      displayName: string
+      shortDisplayName: string
+      description: string
   EntityIdGetResponse:
     type: object
     properties:
@@ -530,15 +552,4 @@ types:
     discriminatorValue: date
     properties:
       distributionDefaults: API_DateDistributionDefaults
-  File:
-    type: object
-    additionalProperties: false
-    properties:
-      name: string
-      modifiedDate: string
-      size: string
-  FileContentResponse:
-    type: object
-    properties:
-      //: any
 
