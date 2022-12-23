@@ -7,17 +7,6 @@
 ################################################################################
 
 types:
-  File:
-    type: object
-    additionalProperties: false
-    properties:
-      name: string
-      modifiedDate: string
-      size: string
-  FileContentResponse:
-    type: object
-    properties:
-      //: any
   VariableClass:
     type: string
     enum:
@@ -552,4 +541,15 @@ types:
     discriminatorValue: date
     properties:
       distributionDefaults: API_DateDistributionDefaults
+  File:
+    type: object
+    additionalProperties: false
+    properties:
+      name: string
+      modifiedDate: string
+      size: string
+  FileContentResponse:
+    type: object
+    properties:
+      //: any
 
