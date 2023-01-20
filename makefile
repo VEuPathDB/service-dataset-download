@@ -74,8 +74,7 @@ test:
 	./gradlew clean test
 
 .PHONY: jar
-jar:
-	make build/libs/service.jar
+jar: build/libs/service.jar
 
 .PHONY: docker
 docker:
@@ -85,5 +84,5 @@ docker:
 # File based targets
 #
 
-build/libs/service.jar: build.gradle.kts api.raml $(shell find schema) $(shell find src)
+build/libs/service.jar: build.gradle.kts
 	./gradlew clean test generate-raml-docs shadowJar
