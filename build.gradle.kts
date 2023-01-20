@@ -2,7 +2,7 @@ import org.veupathdb.lib.gradle.container.util.Logger.Level
 
 plugins {
   java
-  id("org.veupathdb.lib.gradle.container.container-utils") version "4.7.1"
+  id("org.veupathdb.lib.gradle.container.container-utils") version "4.8.2"
   id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
@@ -44,20 +44,7 @@ containerBuild {
     imageName = "dataset-download-service"
 
   }
-
-  generateJaxRS {
-    // List of custom arguments to use in the jax-rs code generation command
-    // execution.
-    arguments = listOf(/*arg1, arg2, arg3*/)
-
-    // Map of custom environment variables to set for the jax-rs code generation
-    // command execution.
-    environment = mapOf(/*Pair("env-key", "env-val"), Pair("env-key", "env-val")*/)
-  }
-
 }
-
-tasks.register("print-gen-package") { print("org.veupathdb.service") }
 
 java {
   toolchain {
@@ -92,21 +79,12 @@ val coreLib       = "6.13.2"         // Container core lib version
 val edaCommon     = "10.2.2"         // EDA Common version
 val fgputil       = "2.12.0-jakarta" // FgpUtil version
 
-// use local EdaCommon compiled schema if project exists, else use released version;
-//    this mirrors the way we use local EdaCommon code if available
-val edaCommonLocalProjectDir = findProject(":edaCommon")?.projectDir
-val edaCommonSchemaFetch =
-  if (edaCommonLocalProjectDir != null)
-    "cat ${edaCommonLocalProjectDir}/schema/library.raml"
-  else
-    "curl https://raw.githubusercontent.com/VEuPathDB/EdaCommon/v${edaCommon}/schema/library.raml"
-
-// register a task that prints the command to fetch EdaCommon schema; used to pull down raml lib
-tasks.register("print-eda-common-schema-fetch") { print(edaCommonSchemaFetch) }
-
-// ensures changing modules are never cached
+// ensures changing and dynamic modules are never cached
 configurations.all {
-  resolutionStrategy.cacheChangingModulesFor(0, TimeUnit.SECONDS)
+  resolutionStrategy {
+    cacheChangingModulesFor(0, TimeUnit.SECONDS)
+    cacheDynamicVersionsFor(0, TimeUnit.SECONDS)
+  }
 }
 
 dependencies {
@@ -140,9 +118,9 @@ dependencies {
   implementation("com.devskiller.friendly-id:friendly-id:1.1.0")
 
   // Unit Testing
-  testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.0")
-  testImplementation("org.mockito:mockito-core:4.8.0")
-  testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.0")
+  testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
+  testImplementation("org.mockito:mockito-core:4.11.0")
+  testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.2")
 }
 
 val test by tasks.getting(Test::class) {
