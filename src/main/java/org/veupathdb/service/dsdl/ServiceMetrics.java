@@ -16,35 +16,7 @@ public class ServiceMetrics {
       .labelNames(STUDY_LABEL, USER_LABEL, RESOURCE_LABEL)
       .register();
 
-  public static DownloadReporter downloadReporter() {
-    return new DownloadReporter();
-  }
-
-  /**
-   * Builder-like interface for reporting download count metrics.
-   */
-  public static class DownloadReporter {
-    private String studyName;
-    private String userId;
-    private String resourceName;
-
-    public DownloadReporter withStudyName(String studyName) {
-      this.studyName = studyName;
-      return this;
-    }
-
-    public DownloadReporter withUserId(String userId) {
-      this.userId = userId;
-      return this;
-    }
-
-    public DownloadReporter withResourceName(String resourceName) {
-      this.resourceName = resourceName;
-      return this;
-    }
-
-    public void report() {
-      STUDY_FILE_DOWNLOAD_METRIC.labels(studyName, userId, resourceName).inc();
-    }
+  public static void reportDownloadCount(String study, String userId, String resourceName) {
+    STUDY_FILE_DOWNLOAD_METRIC.labels(study, userId, resourceName).inc();
   }
 }
