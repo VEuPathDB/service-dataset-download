@@ -4,6 +4,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.function.Function;
 import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.NotFoundException;
@@ -59,8 +60,14 @@ public class Service implements Download {
     String datasetHash = checkPermsAndFetchDatasetHash(studyId, StudyAccess::allowResultsAll);
     Path filePath = new FileStore(Resources.getDatasetsParentDir(project))
         .getFilePath(datasetHash, release, fileName)
-        .orElseThrow(NotFoundException::new);
+        .orElseThrow(() -> {
+          LOG.info("Unable to find a file with hash {}, release {}, and name {}.", datasetHash, release, fileName);
+          return new NotFoundException();
+        });
     String dispositionHeaderValue = "attachment; filename=\"" + fileName + "\"";
+    Optional<String> userId = UserProvider.lookupUser(_request)
+        .map(user -> Long.toString(user.getUserID()));
+    ServiceMetrics.reportDownloadCount(studyId, userId.orElse("None"), fileName);
     _request.setProperty(CustomResponseHeadersFilter.CUSTOM_HEADERS_KEY,
         new MapBuilder<>(HttpHeaders.CONTENT_DISPOSITION, dispositionHeaderValue).toMap());
     return GetDownloadByProjectAndStudyIdAndReleaseAndFileResponse.respond200WithTextPlain(
