@@ -16,7 +16,7 @@ public class ServiceMetrics {
       .labelNames(STUDY_LABEL, USER_LABEL, RESOURCE_LABEL)
       .register();
 
-  public static void reportDownloadCount(String study, String userId, String resourceName) {
-    STUDY_FILE_DOWNLOAD_METRIC.labels(study, userId, resourceName).inc();
+  public static void reportDownloadCount(String datasetId, String userId, String resourceName) {
+    STUDY_FILE_DOWNLOAD_METRIC.labels(datasetId, userId, resourceName).inc();
   }
 }
