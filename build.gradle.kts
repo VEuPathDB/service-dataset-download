@@ -2,7 +2,7 @@ import org.veupathdb.lib.gradle.container.util.Logger.Level
 
 plugins {
   java
-  id("org.veupathdb.lib.gradle.container.container-utils") version "4.8.5"
+  id("org.veupathdb.lib.gradle.container.container-utils") version "4.8.9"
   id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
@@ -75,9 +75,9 @@ repositories {
 //
 
 // versions
-val coreLib       = "6.15.2"         // Container core lib version
-val edaCommon     = "10.5.1"         // EDA Common version
-val fgputil       = "2.12.6-jakarta" // FgpUtil version
+val coreLib       = "6.16.0"         // Container core lib version
+val edaCommon     = "10.9.0"         // EDA Common version
+val fgputil       = "2.12.9-jakarta" // FgpUtil version
 
 // ensures changing and dynamic modules are never cached
 configurations.all {
@@ -102,8 +102,8 @@ dependencies {
   implementation("org.glassfish.jersey.core:jersey-server:3.1.1")
 
   // Jackson
-  implementation("com.fasterxml.jackson.core:jackson-databind:2.14.2")
-  implementation("com.fasterxml.jackson.core:jackson-annotations:2.14.2")
+  implementation("com.fasterxml.jackson.core:jackson-databind:2.15.1")
+  implementation("com.fasterxml.jackson.core:jackson-annotations:2.15.1")
 
   // Log4J
   implementation("org.apache.logging.log4j:log4j-api:2.20.0")
