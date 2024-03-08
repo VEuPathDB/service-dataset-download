@@ -66,7 +66,7 @@ public class Service implements Download {
         });
     String dispositionHeaderValue = "attachment; filename=\"" + fileName + "\"";
     Optional<String> userId = UserProvider.lookupUser(_request)
-        .map(user -> Long.toString(user.getUserID()));
+        .map(user -> Long.toString(user.getUserId()));
     ServiceMetrics.reportDownloadCount(datasetInfo.getDatasetId(), userId.orElse("None"), fileName);
     _request.setProperty(CustomResponseHeadersFilter.CUSTOM_HEADERS_KEY,
         new MapBuilder<>(HttpHeaders.CONTENT_DISPOSITION, dispositionHeaderValue).toMap());
